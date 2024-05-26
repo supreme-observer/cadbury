@@ -1,0 +1,29 @@
+{
+  "name": "cadbury",
+  "version": "1.0.0",
+  "description": "Greetings, esteemed developer! I am Cadbury, your trusty AI butler, inspired by the ever-diligent and resourceful butler of Richie Rich. I am here to serve you in the realm of code, utilizing the latest in Large Language Models (LLMs) to assist with various programming tasks. Whether it's debugging, writing code snippets, or providing insightful suggestions, you can count on me to make your development journey as smooth and efficient as possible. Just install me through npm, and let me take care of the rest. Your coding experience is about to become much more refined.",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/index.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/supreme-observer/cadbury.git"
+  },
+  "author": "Nikhil Mishra",
+  "license": "MIT",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/supreme-observer/cadbury/issues"
+  },
+  "homepage": "https://github.com/supreme-observer/cadbury#readme",
+  "dependencies": {
+    "@types/node": "^20.12.12",
+    "typescript": "^5.4.5"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2"
+  }
+}
