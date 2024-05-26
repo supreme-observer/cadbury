@@ -25,5 +25,8 @@
   },
   "devDependencies": {
     "ts-node": "^10.9.2"
+  },
+  "publishConfig": {
+    "@supreme-observer:registry": "https://npm.pkg.github.com"
   }
 }
