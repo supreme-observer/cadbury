@@ -32,6 +32,10 @@ export interface CadburyConfig {
   openaiApiKey?: string;
   anthropicApiKey?: string;
   tavilyApiKey?: string;
+  awsAccessKeyId?: string;
+  awsSecretAccessKey?: string;
+  awsSessionToken?: string;
+  awsRegion?: string; // Region for Bedrock calls, default: "us-east-1"
   modelName?: string;
   temperature?: number;
   personality?: PersonalityConfig;

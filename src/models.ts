@@ -9,6 +9,7 @@ export interface ModelDefinition {
     input: number;  // $ per 1M input tokens
     output: number; // $ per 1M output tokens
   };
+  bedrockModelId?: string; // AWS Bedrock model ID, set only for provider: 'bedrock'
 }
 
 /** Safe to send to clients — pricing stripped */
@@ -128,6 +129,96 @@ export const MODEL_REGISTRY: ModelDefinition[] = [
     bestFor: 'Real-time monitoring agents, high-frequency polling, low-latency signal checks, and tasks where sub-second response is more important than reasoning depth.',
     costTier: 'low',
     pricing: { input: 1.0, output: 5.0 },
+  },
+
+  // ─── AWS Bedrock ───────────────────────────────────────────────────────────
+
+  // HIGH — frontier reasoning
+  {
+    id: 'bedrock-claude-3-opus',
+    name: 'Claude 3 Opus (Bedrock)',
+    provider: 'bedrock',
+    description: 'Claude 3 Opus served through AWS Bedrock — same model, billed via AWS',
+    bestFor: 'Top-level orchestrator agents and complex reasoning when routing through AWS Bedrock (e.g. other providers are rate-limited or unavailable).',
+    costTier: 'high',
+    pricing: { input: 15.0, output: 75.0 },
+    bedrockModelId: 'anthropic.claude-3-opus-20240229-v1:0',
+  },
+
+  // MODERATE — balanced production workloads
+  {
+    id: 'bedrock-claude-3-5-sonnet',
+    name: 'Claude 3.5 Sonnet (Bedrock)',
+    provider: 'bedrock',
+    description: 'Claude 3.5 Sonnet served through AWS Bedrock',
+    bestFor: 'Production agents needing strong reasoning at moderate cost when routing through AWS Bedrock.',
+    costTier: 'moderate',
+    pricing: { input: 3.0, output: 15.0 },
+    bedrockModelId: 'anthropic.claude-3-5-sonnet-20241022-v2:0',
+  },
+  {
+    id: 'bedrock-llama-3-1-405b',
+    name: 'Llama 3.1 405B (Bedrock)',
+    provider: 'bedrock',
+    description: "Meta's largest open-weight model, served through AWS Bedrock",
+    bestFor: 'High-throughput production workloads that want open-weight model economics on AWS infrastructure.',
+    costTier: 'moderate',
+    pricing: { input: 5.32, output: 16.0 },
+    bedrockModelId: 'meta.llama3-1-405b-instruct-v1:0',
+  },
+  {
+    id: 'bedrock-mistral-large',
+    name: 'Mistral Large (Bedrock)',
+    provider: 'bedrock',
+    description: "Mistral AI's flagship model, served through AWS Bedrock",
+    bestFor: 'Complex reasoning and analysis tasks that want an open-weight alternative to Claude/GPT on AWS infrastructure.',
+    costTier: 'moderate',
+    pricing: { input: 4.0, output: 12.0 },
+    bedrockModelId: 'mistral.mistral-large-2407-v1:0',
+  },
+
+  // LOW — high-throughput / cost-efficient
+  {
+    id: 'bedrock-llama-3-1-70b',
+    name: 'Llama 3.1 70B (Bedrock)',
+    provider: 'bedrock',
+    description: "Meta's mid-size open-weight model, served through AWS Bedrock",
+    bestFor: 'Fast screening, routing, and decision-making sub-agents where full 405B-class reasoning is not required.',
+    costTier: 'low',
+    pricing: { input: 0.72, output: 0.72 },
+    bedrockModelId: 'meta.llama3-1-70b-instruct-v1:0',
+  },
+  {
+    id: 'bedrock-mistral-small',
+    name: 'Mistral Small (Bedrock)',
+    provider: 'bedrock',
+    description: "Mistral AI's compact model, served through AWS Bedrock",
+    bestFor: 'Quick, cost-effective tasks such as classification and short-form generation.',
+    costTier: 'low',
+    pricing: { input: 1.0, output: 3.0 },
+    bedrockModelId: 'mistral.mistral-small-2402-v1:0',
+  },
+  {
+    id: 'bedrock-titan-text-premier',
+    name: 'Titan Text Premier (Bedrock)',
+    provider: 'bedrock',
+    description: "Amazon's general-purpose foundation model, served through AWS Bedrock",
+    bestFor: 'General-purpose, cost-effective monitoring and text tasks on native AWS infrastructure.',
+    costTier: 'low',
+    pricing: { input: 0.50, output: 1.50 },
+    bedrockModelId: 'amazon.titan-text-premier-v1:0',
+  },
+
+  // MODERATE — retrieval / RAG
+  {
+    id: 'bedrock-cohere-command-r',
+    name: 'Cohere Command R (Bedrock)',
+    provider: 'bedrock',
+    description: "Cohere's retrieval-optimised model, served through AWS Bedrock",
+    bestFor: 'RAG pipelines and retrieval-heavy tasks needing citation-aware generation.',
+    costTier: 'moderate',
+    pricing: { input: 0.50, output: 1.50 },
+    bedrockModelId: 'cohere.command-r-v1:0',
   },
 ];
 
