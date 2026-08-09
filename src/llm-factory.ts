@@ -9,9 +9,14 @@ import { MODEL_REGISTRY } from "./models";
 export function createLLM(config: CadburyConfig): BaseChatModel {
   const modelName = config.modelName || "gpt-3.5-turbo";
   const registryEntry = MODEL_REGISTRY.find((m) => m.id === modelName);
+  
+  // Detect provider: registry -> Bedrock pattern -> Anthropic -> OpenAI
+  const bedrockPattern = /^(amazon|meta|mistral|cohere|ai21|stability|deepseek|qwen|nvidia|minimax|zai|moonshot|google)\.[a-z0-9-]+:\d+$|^(bedrock-)/i;
+  const isBedrockModel = bedrockPattern.test(modelName);
+  
   const provider =
     registryEntry?.provider ??
-    (modelName.startsWith("claude-") ? "anthropic" : "openai");
+    (isBedrockModel ? "bedrock" :modelName.startsWith("claude-") ? "anthropic" : "openai");
 
   if (provider === "bedrock") {
     if (!config.awsAccessKeyId || !config.awsSecretAccessKey) {
