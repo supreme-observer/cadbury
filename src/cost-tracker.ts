@@ -1,5 +1,6 @@
 import { CostInfo } from "./types";
 import { MODEL_PRICING_MAP } from "./models";
+import { BEDROCK_METADATA } from "./bedrock-metadata";
 
 const MODEL_PRICING = MODEL_PRICING_MAP;
 
@@ -72,9 +73,21 @@ export class CostTracker {
   }
 
   private calculateCost(inputTokens: number, outputTokens: number): number {
-    const pricing =
+    let pricing =
       MODEL_PRICING[this.model as keyof typeof MODEL_PRICING] ||
       MODEL_PRICING["gpt-4o-mini"];
+
+    // Check if this is a Bedrock model ID (contains .)
+    if (this.model.includes('.')) {
+      // It's a direct Bedrock model ID, look up in metadata
+      const bedrockMetadata = BEDROCK_METADATA[this.model];
+      if (bedrockMetadata) {
+        pricing = bedrockMetadata.pricing;
+      } else {
+        // Default Bedrock pricing if not in metadata
+        pricing = { input: 0.001, output: 0.003 };
+      }
+    }
 
     const inputCost = (inputTokens / 1_000_000) * pricing.input;
     const outputCost = (outputTokens / 1_000_000) * pricing.output;

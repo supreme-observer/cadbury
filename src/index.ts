@@ -42,9 +42,10 @@ import {
   MCPDiscoveredTool,
 } from "./types";
 import { CostTracker } from "./cost-tracker";
-import { getModels, MODEL_REGISTRY } from "./models";
+import { getModels, getModelsSync, MODEL_REGISTRY } from "./models";
+import { listBedrockModels, clearCatalogCache } from "./bedrock-catalog";
 export type { ModelDefinition, AgentModel } from "./models";
-export { getModels, MODEL_REGISTRY };
+export { getModels, getModelsSync, MODEL_REGISTRY, listBedrockModels, clearCatalogCache };
 import { createWebAutomationTool } from "./web-automation";
 import { createWebAgent } from "./web-agent";
 import { createEmbeddings, processPDFWithEmbeddings } from "./pdf-processor";

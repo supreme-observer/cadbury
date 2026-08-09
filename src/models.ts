@@ -222,8 +222,66 @@ export const MODEL_REGISTRY: ModelDefinition[] = [
   },
 ];
 
-/** Returns all models with pricing stripped — safe to expose to clients. */
-export function getModels(): AgentModel[] {
+/** 
+ * Returns all models with pricing stripped — safe to expose to clients.
+ * For Bedrock models, dynamically fetches from AWS if credentials provided.
+ */
+export async function getModels(config?: {
+  awsAccessKeyId?: string;
+  awsSecretAccessKey?: string;
+  awsRegion?: string;
+}): Promise<AgentModel[]> {
+  const staticModels = MODEL_REGISTRY.map(({ pricing: _, ...rest }) => rest);
+
+  // If AWS credentials provided, fetch Bedrock models dynamically
+  if (config?.awsAccessKeyId && config?.awsSecretAccessKey) {
+    try {
+      const { listBedrockModels } = await import('./bedrock-catalog');
+      const { getBedrockMetadata } = await import('./bedrock-metadata');
+      
+      const discoveredBedrock = await listBedrockModels({
+        accessKeyId: config.awsAccessKeyId,
+        secretAccessKey: config.awsSecretAccessKey,
+        region: config.awsRegion,
+      });
+
+      // Filter out Anthropic models from Bedrock (use direct Anthropic instead)
+      const nonAnthropicBedrock = discoveredBedrock.filter(
+        m => !m.bedrockModelId.toLowerCase().includes('anthropic') && 
+             !m.bedrockModelId.toLowerCase().includes('claude')
+      );
+
+      // Convert discovered models to AgentModel format with metadata overlay
+      const bedrockModels: AgentModel[] = nonAnthropicBedrock.map(discovered => {
+        const metadata = getBedrockMetadata(discovered.bedrockModelId);
+        
+        return {
+          id: discovered.id,
+          name: metadata.displayName,
+          provider: 'bedrock',
+          description: metadata.description,
+          bestFor: metadata.bestFor.join(', '),
+          costTier: metadata.costTier === 'very-high' ? 'high' : 
+                    metadata.costTier === 'very-low' ? 'low' : metadata.costTier,
+          bedrockModelId: discovered.bedrockModelId,
+        };
+      });
+
+      // Merge: remove static Bedrock models, add dynamic ones
+      const nonBedrockModels = staticModels.filter(m => m.provider !== 'bedrock');
+      return [...nonBedrockModels, ...bedrockModels];
+    } catch (error) {
+      // Fallback to static models if Bedrock discovery fails
+      console.error('[Models] Bedrock discovery failed, using static models:', error);
+      return staticModels;
+    }
+  }
+
+  return staticModels;
+}
+
+/** Legacy sync version for backward compatibility */
+export function getModelsSync(): AgentModel[] {
   return MODEL_REGISTRY.map(({ pricing: _, ...rest }) => rest);
 }
 

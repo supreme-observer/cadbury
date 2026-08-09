@@ -19,8 +19,13 @@ export function createLLM(config: CadburyConfig): BaseChatModel {
         `Model "${modelName}" requires awsAccessKeyId and awsSecretAccessKey in CadburyConfig`
       );
     }
+    
+    // Use bedrockModelId from registry if present, otherwise use modelName directly
+    // This allows dynamic Bedrock models to work without registry lookup
+    const bedrockModelId = registryEntry?.bedrockModelId || modelName;
+    
     return new ChatBedrockConverse({
-      model: registryEntry?.bedrockModelId || modelName,
+      model: bedrockModelId,
       region: config.awsRegion || "us-east-1",
       credentials: {
         accessKeyId: config.awsAccessKeyId,
