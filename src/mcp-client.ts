@@ -19,6 +19,9 @@ export interface MCPClientConfig {
   timeoutMs?: number; // Default: 30000
   clientName?: string; // Default: "cadbury"
   clientVersion?: string; // Default: package version
+  // Pre-existing Mcp-Session-Id to resume (e.g. restored from persistent storage across a
+  // server restart) instead of starting a fresh, unauthenticated session.
+  sessionId?: string;
 }
 
 export interface MCPServerInfo {
@@ -67,6 +70,15 @@ export class MCPClient {
     this.timeoutMs = config.timeoutMs || 30000;
     this.clientName = config.clientName || "cadbury";
     this.clientVersion = config.clientVersion || "1.1.0";
+    this.sessionId = config.sessionId;
+  }
+
+  /**
+   * The current Mcp-Session-Id (set by the server on `initialize`, or the resumed one
+   * passed via config.sessionId). Undefined until the first request completes.
+   */
+  getSessionId(): string | undefined {
+    return this.sessionId;
   }
 
   /**
